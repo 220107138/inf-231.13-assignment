@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Accordion Component</title>
+    <style>
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: black;
+    }
+
+    #app {
+        text-align: center;
+    }
+
+    .accordion {
+        width: 300px;
+    }
+
+    .accordion-item {
+        border-radius: 25px;
+        margin-bottom: 10px;
+        overflow: hidden;
+    }
+
+    .accordion-header {
+        background-color: teal;
+        color: #fff;
+        padding: 15px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .accordion-title {
+        flex: 1;
+        margin-left: 10px;
+    }
+
+    .accordion-icon {
+        font-size: 18px;
+        transform: rotate(0deg);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .accordion-item.open .accordion-icon {
+        transform: rotate(180deg);
+    }
+
+    .accordion-content {
+        padding: 15px;
+        background-color: #ecf0f1;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
+    }
+
+    .accordion-item.open .accordion-content {
+        max-height: 200px; /* Adjust as needed */
+    }
+    </style>
+</head>
+<body>
+    <div id="app">
+    <accordion-component :items="accordionItems">
+        <template v-slot:content="{ item }">
+        <!-- Custom content goes here -->
+        <p>This is the content for {{ item.title }}</p>
+        </template>
+    </accordion-component>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script>
+    Vue.component('accordion-component', {
+        props: ['items'],
+        data() {
+        return {
+            openSections: [],
+        };
+        },
+        methods: {
+        toggleSection(index) {
+            if (this.isOpen(index)) {
+            this.closeSection(index);
+            } else {
+            this.openSection(index);
+            }
+        },
+        openSection(index) {
+            this.openSections.push(index);
+        },
+        closeSection(index) {
+            this.openSections = this.openSections.filter(i => i !== index);
+        },
+        isOpen(index) {
+            return this.openSections.includes(index);
+        },
+        },
+        template: `
+        <div class="accordion">
+            <div v-for="(item, index) in items" :key="index" :class="{ 'accordion-item': true, 'open': isOpen(index) }">
+            <div class="accordion-header" @click="toggleSection(index)">
+                <span class="accordion-title">{{ item.title }}</span>
+                <span class="accordion-icon">&#9654;</span>
+            </div>
+            <div v-if="isOpen(index)" class="accordion-content">
+                <slot name="content" :item="item"></slot>
+            </div>
+            </div>
+        </div>
+        `,
+    });
+
+    new Vue({
+        el: '#app',
+        data: {
+        accordionItems: [
+            { name: 'name1', title: 'Section 1' },
+            { name: 'name2', title: 'Section 2', expanded: true },
+            { name: 'name3', title: 'Section 3', expanded: true },
+            { name: 'name4', title: 'Section 4', expanded: true },
+            { name: 'name5', title: 'Section 5', expanded: true },
+        ],
+        },
+    });
+    </script>
+</body>
+</html>
